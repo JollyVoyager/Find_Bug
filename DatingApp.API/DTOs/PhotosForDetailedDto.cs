@@ -1,8 +1,8 @@
 using System;
 
-namespace DatingApp.API.DTOs
+namespace DatingApp.API.Dtos
 {
-    public class PhotoforDetailedDto
+    public class PhotosForDetailedDto
     {
         public int Id { get; set; }
         public string Url { get; set; }

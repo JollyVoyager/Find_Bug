@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { User } from '../../_models/user';
 import { UserService } from '../../_services/user.service';
 import { AlertifyService } from '../../_services/alertify.service';
-import { User } from '../../_models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Pagination } from 'src/app/_models/pagination';
 
@@ -18,9 +18,9 @@ export class MemberListComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe(data => {
-      console.log(data);
       this.users = data['users'].result;
       this.pagination = data['users'].pagination;
+      console.log(this.pagination);
     });
   }
 
@@ -32,6 +32,4 @@ export class MemberListComponent implements OnInit {
   //   });
   // }
 
-
 }
-

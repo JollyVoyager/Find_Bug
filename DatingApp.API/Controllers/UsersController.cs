@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using DatingApp.API.Data;
-using DatingApp.API.DTOs;
+using DatingApp.API.Dtos;
 using DatingApp.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +19,11 @@ namespace DatingApp.API.Controllers
     {
         private readonly IDatingRepository _repo;
         private readonly IMapper _mapper;
+
         public UsersController(IDatingRepository repo, IMapper mapper)
         {
-            _mapper = mapper;
             _repo = repo;
-
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -33,15 +33,12 @@ namespace DatingApp.API.Controllers
 
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
 
-            Response.AddPagination(users.CurrentPage, users.PageSize,
-
-            users.TotalCount, users.TotalPages);
-
+            Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+            
             return Ok(usersToReturn);
         }
 
         [HttpGet("{id}", Name = "GetUser")]
-
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await _repo.GetUser(id);
@@ -55,15 +52,15 @@ namespace DatingApp.API.Controllers
         public async Task<IActionResult> UpdateUser(int id, UserForUpdateDto userForUpdateDto)
         {
             if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-            return Unauthorized();
-
+                return Unauthorized();
+            
             var userFromRepo = await _repo.GetUser(id);
 
             _mapper.Map(userForUpdateDto, userFromRepo);
 
             if (await _repo.SaveAll())
-            return NoContent();
-
+                return NoContent();
+            
             throw new Exception($"Updating user {id} failed on save");
         }
     }

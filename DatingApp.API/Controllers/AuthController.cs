@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using DatingApp.API.Data;
-using DatingApp.API.DTOs;
+using DatingApp.API.Dtos;
 using DatingApp.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -20,10 +20,11 @@ namespace DatingApp.API.Controllers
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
+
         public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
-            _mapper = mapper;
             _config = config;
+            _mapper = mapper;
             _repo = repo;
 
         }
@@ -31,17 +32,16 @@ namespace DatingApp.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(/*[FromBody]*/UserForRegisterDto userForRegisterDto)
         {
-            // validate the request
-            //caso o Controller do API falhe, acho eu xD
-
-            /* if(!ModelState.IsValid)
-                  return BadRequest(ModelState);*/
+            // validate request
+            /*
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            */
 
             userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
 
             if (await _repo.UserExists(userForRegisterDto.Username))
                 return BadRequest("Username already exists");
-
 
             var userToCreate = _mapper.Map<User>(userForRegisterDto);
 
@@ -49,11 +49,8 @@ namespace DatingApp.API.Controllers
 
             var userToReturn = _mapper.Map<UserForDetailedDto>(createdUser);
 
-            return CreatedAtRoute("GetUser", new {controller = "Users",
-                id = createdUser.Id}, userToReturn);
+            return CreatedAtRoute("GetUser", new {controller = "Users", id = createdUser.Id }, userToReturn);
         }
-
-
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
@@ -67,13 +64,10 @@ namespace DatingApp.API.Controllers
                 new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
                 new Claim(ClaimTypes.Name, userFromRepo.Username)
             };
-            //Assinar o token, criar uma security key e encriptá-la
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-
-            //Criação do Token
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -88,11 +82,11 @@ namespace DatingApp.API.Controllers
 
             var user = _mapper.Map<UserForListDto>(userFromRepo);
 
-                return Ok(new
-                {
-                    token = tokenHandler.WriteToken(token),
-                    user
-                });
+            return Ok(new
+            {
+                token = tokenHandler.WriteToken(token),
+                user
+            });
         }
     }
 }
